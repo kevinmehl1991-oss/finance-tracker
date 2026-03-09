@@ -8,8 +8,8 @@ const CONFIG = {
   // ----------------------------------------------------------
   // API Endpunkte (n8n Webhooks)
   // ----------------------------------------------------------
-  API_GET_TRANSACTIONS: "https://your-n8n-instance.com/webhook/finance/get-transactions",
-  API_ADD_TRANSACTION:  "https://your-n8n-instance.com/webhook/finance/add-transaction",
+  API_GET_TRANSACTIONS: "https://n8n.srv1474416.hstgr.cloud/webhook/finance/get-transactions",
+API_ADD_TRANSACTION:  "https://n8n.srv1474416.hstgr.cloud/webhook/finance/add-transaction",
   API_GET_CATEGORIES:   "https://your-n8n-instance.com/webhook/finance/get-categories",
 
   // ----------------------------------------------------------
