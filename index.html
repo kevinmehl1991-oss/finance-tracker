@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finance Tracker</title>
+  <meta name="description" content="Privater Finanztracker – lokal, schnell, ohne Cloud-Abo." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Login Overlay -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-logo">💜</div>
+    <h1 class="login-title">FinanceTracker</h1>
+    <p class="login-sub">Gib dein Passwort ein um fortzufahren</p>
+    <div class="login-field">
+      <input type="password" id="login-input" class="login-input" placeholder="Passwort…" autocomplete="current-password"/>
+      <span class="login-err" id="login-err"></span>
+    </div>
+    <button class="btn btn-primary login-btn" id="login-btn">Einloggen</button>
+  </div>
+</div>
+
+<div id="loading-overlay" aria-hidden="true">
+  <div class="loader-ring"><div></div><div></div><div></div><div></div></div>
+</div>
+
+<div class="app-shell">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">💜</div>
+      <div class="brand-text">
+        <span class="brand-name">FinanceTracker</span>
+        <span class="brand-sub">Privat &amp; lokal</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-section="dashboard">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0zm8-5a1 1 0 0 1 1 1v4h3a1 1 0 1 1 0 2h-4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>
+        <span class="nav-label">Dashboard</span>
+      </button>
+      <button class="nav-item" data-section="add">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 0 1 1 1v5h5a1 1 0 1 1 0 2h-5v5a1 1 0 1 1-2 0v-5H4a1 1 0 1 1 0-2h5V4a1 1 0 0 1 1-1z" clip-rule="evenodd"/></svg>
+        <span class="nav-label">Neu erfassen</span>
+      </button>
+      <button class="nav-item" data-section="list">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 5a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 5a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z" clip-rule="evenodd"/></svg>
+        <span class="nav-label">Transaktionen</span>
+      </button>
+      <button class="nav-item" data-section="categories">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5zm0 8a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2H5zm6-8a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2zm0 8a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-2z"/></svg>
+        <span class="nav-label">Kategorien</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-status">
+      <div class="status-pill">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Online</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main-area">
+
+    <header class="topbar">
+      <div class="mobile-brand">
+        <div class="brand-logo">💜</div>
+        <span>Finance<strong>Tracker</strong></span>
+      </div>
+      <div class="topbar-right">
+        <input type="month" id="month-select" class="month-select" aria-label="Monat" />
+        <button id="reload-btn" class="ctrl-btn" title="Neu laden">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+        </button>
+        <button id="theme-toggle" class="ctrl-btn" title="Theme">
+          <svg id="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <svg id="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div id="banner" class="banner" role="alert" aria-live="polite"></div>
+
+    <main class="content-area">
+
+      <!-- ── DASHBOARD ── -->
+      <section id="section-dashboard" class="section active">
+        <div class="page-header">
+          <div>
+            <h2 class="page-title">Übersicht</h2>
+            <p class="page-sub" id="dashboard-month-label">–</p>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap income-icon">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17"><path fill-rule="evenodd" d="M5.293 9.707a1 1 0 0 1 0-1.414l4-4a1 1 0 0 1 1.414 0l4 4a1 1 0 0 1-1.414 1.414L11 7.414V15a1 1 0 1 1-2 0V7.414L6.707 9.707a1 1 0 0 1-1.414 0z" clip-rule="evenodd"/></svg>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-label">Einnahmen</div>
+              <div class="kpi-value" id="kpi-income">–</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap expense-icon">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17"><path fill-rule="evenodd" d="M14.707 10.293a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 1 1 1.414-1.414L9 12.586V5a1 1 0 0 1 2 0v7.586l2.293-2.293a1 1 0 0 1 1.414 0z" clip-rule="evenodd"/></svg>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-label">Ausgaben</div>
+              <div class="kpi-value" id="kpi-expense">–</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap balance-icon">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm1-13a1 1 0 1 0-2 0v.092a4.535 4.535 0 0 0-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 1 0-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 1 0 2 0v-.092a4.535 4.535 0 0 0 1.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0 0 11 9.092V7.151c.391.127.68.317.843.504a1 1 0 1 0 1.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/></svg>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-label">Saldo</div>
+              <div class="kpi-value" id="kpi-balance">–</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap count-icon">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17"><path d="M9 2a1 1 0 0 0 0 2h2a1 1 0 1 0 0-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 0 1 2-2 3 3 0 0 0 3 3h2a3 3 0 0 0 3-3 2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5zm3 4a1 1 0 0 0 0 2h.01a1 1 0 1 0 0-2H7zm3 0a1 1 0 0 0 0 2h3a1 1 0 1 0 0-2h-3zm-3 4a1 1 0 0 0 0 2h.01a1 1 0 1 0 0-2H7zm3 0a1 1 0 0 0 0 2h3a1 1 0 1 0 0-2h-3z" clip-rule="evenodd"/></svg>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-label">Buchungen</div>
+              <div class="kpi-value" id="kpi-count">–</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Ausgaben nach Kategorie</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart-canvas"></canvas>
+            <div class="chart-empty" id="chart-empty">
+              <span class="empty-emoji">📊</span>
+              <p>Noch keine Ausgabendaten</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── NEU ERFASSEN ── -->
+      <section id="section-add" class="section">
+        <div class="page-header">
+          <h2 class="page-title">Neue Transaktion</h2>
+        </div>
+
+        <div class="card">
+          <div class="type-toggle-row">
+            <div class="type-toggle" id="type-toggle">
+              <button class="type-btn active" data-type="expense" type="button">
+                <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M14.707 10.293a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 1 1 1.414-1.414L9 12.586V5a1 1 0 0 1 2 0v7.586l2.293-2.293a1 1 0 0 1 1.414 0z" clip-rule="evenodd"/></svg>
+                Ausgabe
+              </button>
+              <button class="type-btn" data-type="income" type="button">
+                <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 9.707a1 1 0 0 1 0-1.414l4-4a1 1 0 0 1 1.414 0l4 4a1 1 0 0 1-1.414 1.414L11 7.414V15a1 1 0 1 1-2 0V7.414L6.707 9.707a1 1 0 0 1-1.414 0z" clip-rule="evenodd"/></svg>
+                Einnahme
+              </button>
+            </div>
+          </div>
+
+          <form id="tx-form" novalidate>
+            <input type="hidden" id="f-type" value="expense" />
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="f-date">Datum <span class="req-mark">*</span></label>
+                <input type="date" id="f-date" class="form-input" required />
+                <span class="field-hint err" id="err-date"></span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-amount">Betrag <span class="req-mark">*</span></label>
+                <div class="input-affix-wrap">
+                  <span class="input-prefix">€</span>
+                  <input type="number" id="f-amount" class="form-input with-prefix" min="0.01" step="0.01" placeholder="0.00" required />
+                </div>
+                <span class="field-hint err" id="err-amount"></span>
+              </div>
+              <div class="form-group full">
+                <label class="form-label" for="f-desc">Beschreibung <span class="req-mark">*</span></label>
+                <input type="text" id="f-desc" class="form-input" placeholder="z.B. Supermarkt, Gehalt März…" required />
+                <span class="field-hint err" id="err-desc"></span>
+              </div>
+              <div class="form-group full">
+                <label class="form-label" for="f-category">Kategorie <span class="req-mark">*</span></label>
+                <select id="f-category" class="form-select" required></select>
+                <span class="field-hint err" id="err-category"></span>
+              </div>
+              <div class="form-group full">
+                <label class="form-label" for="f-note">Notiz <span class="opt-mark">(optional)</span></label>
+                <textarea id="f-note" class="form-textarea" rows="3" placeholder="Optionale Anmerkung…"></textarea>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" id="form-reset-btn" class="btn btn-ghost">Zurücksetzen</button>
+              <button type="submit" id="form-submit-btn" class="btn btn-primary">
+                <span class="btn-label">Speichern</span>
+                <span class="btn-loader" aria-hidden="true"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ── TRANSAKTIONEN ── -->
+      <section id="section-list" class="section">
+        <div class="page-header">
+          <h2 class="page-title">Transaktionen</h2>
+          <span class="badge badge-neutral" id="tx-count-badge" style="display:none"></span>
+        </div>
+
+        <div class="card desktop-only">
+          <div class="table-scroll">
+            <table class="tx-table">
+              <thead>
+                <tr>
+                  <th>Datum</th>
+                  <th>Beschreibung</th>
+                  <th>Kategorie</th>
+                  <th>Typ</th>
+                  <th class="text-right">Betrag</th>
+                </tr>
+              </thead>
+              <tbody id="tx-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="tx-mobile-list mobile-only" id="tx-mobile-list"></div>
+
+        <div class="empty-state-block" id="transaction-empty" style="display:none">
+          <div class="empty-state-emoji">🗂️</div>
+          <p class="empty-title">Keine Transaktionen</p>
+          <p class="empty-sub">Für diesen Monat wurden noch keine Buchungen erfasst.</p>
+          <button class="btn btn-primary btn-sm" onclick="showSection('add')">Erste Buchung erfassen</button>
+        </div>
+      </section>
+
+      <!-- ── KATEGORIEN ── -->
+      <section id="section-categories" class="section">
+        <div class="page-header">
+          <h2 class="page-title">Kategorienübersicht</h2>
+        </div>
+        <div class="card">
+          <div id="category-list" class="cat-list"></div>
+          <div class="empty-state-block" id="category-empty" style="display:none">
+            <div class="empty-state-emoji">🏷️</div>
+            <p class="empty-title">Keine Ausgaben</p>
+            <p class="empty-sub">In diesem Monat wurden noch keine Ausgaben erfasst.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Mobile Nav -->
+    <nav class="mobile-nav">
+      <button class="mobile-nav-btn active" data-section="dashboard">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0zm8-5a1 1 0 0 1 1 1v4h3a1 1 0 1 1 0 2h-4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>
+        <span>Dashboard</span>
+      </button>
+      <button class="mobile-nav-btn" data-section="add">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 0 1 1 1v5h5a1 1 0 1 1 0 2h-5v5a1 1 0 1 1-2 0v-5H4a1 1 0 1 1 0-2h5V4a1 1 0 0 1 1-1z" clip-rule="evenodd"/></svg>
+        <span>Neu</span>
+      </button>
+      <button class="mobile-nav-btn" data-section="list">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 5a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 5a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z" clip-rule="evenodd"/></svg>
+        <span>Liste</span>
+      </button>
+      <button class="mobile-nav-btn" data-section="categories">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5zm0 8a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2H5zm6-8a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2zm0 8a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-2z"/></svg>
+        <span>Kategorien</span>
+      </button>
+    </nav>
+
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
+  integrity="sha512-CQBWl4fJHWbryGE+Pc3UJWW1UywQwB2+9ih1C72/Mbn2Y4JXSe6MlEQSRMJfLzZP/X7oFBGEvICTG3xUnBqg=="
+  crossorigin="anonymous"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
