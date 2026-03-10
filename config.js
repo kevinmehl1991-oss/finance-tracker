@@ -13,7 +13,9 @@ const CONFIG = {
   API_GET_CATEGORIES:   "https://n8n.srv1474416.hstgr.cloud/webhook/finance/get-categories",
   API_ADD_CATEGORY:     "https://n8n.srv1474416.hstgr.cloud/webhook/finance/add-category",
   API_UPDATE_CATEGORY:  "https://n8n.srv1474416.hstgr.cloud/webhook/finance/update-category",
-  API_DELETE_CATEGORY:  "https://n8n.srv1474416.hstgr.cloud/webhook/finance/delete-category",
+  API_DELETE_CATEGORY:   "https://n8n.srv1474416.hstgr.cloud/webhook/finance/delete-category",
+  API_UPDATE_TRANSACTION: "https://n8n.srv1474416.hstgr.cloud/webhook/finance/update-transaction",
+  API_DELETE_TRANSACTION: "https://n8n.srv1474416.hstgr.cloud/webhook/finance/delete-transaction",
 
   // ----------------------------------------------------------
   // Optionale Request-Headers (z.B. für n8n Basic Auth oder Token)

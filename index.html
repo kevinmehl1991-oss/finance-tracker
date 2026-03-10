@@ -309,7 +309,60 @@
       </button>
     </nav>
 
+  
+  <!-- ── Edit Modal ── -->
+  <div id="edit-modal" class="modal-overlay" style="display:none">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Transaktion bearbeiten</h3>
+        <button class="modal-close" id="modal-close-btn">✕</button>
+      </div>
+
+      <div class="type-toggle-row">
+        <div class="type-toggle" id="edit-type-toggle">
+          <button class="type-btn exp active" data-type="expense" type="button">↓ Ausgabe</button>
+          <button class="type-btn inc" data-type="income" type="button">↑ Einnahme</button>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <input type="hidden" id="edit-id"/>
+        <input type="hidden" id="edit-type" value="expense"/>
+        <div class="form-group">
+          <label class="form-label">Betrag <span class="req-mark">*</span></label>
+          <div class="input-affix-wrap">
+            <span class="input-prefix">€</span>
+            <input type="number" id="edit-amount" class="form-input with-prefix" min="0.01" step="0.01" placeholder="0.00"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategorie <span class="req-mark">*</span></label>
+          <select id="edit-category" class="form-select"></select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Beschreibung <span class="req-mark">*</span></label>
+          <input type="text" id="edit-desc" class="form-input" placeholder="Beschreibung…"/>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Notiz <span class="opt-mark">(optional)</span></label>
+          <textarea id="edit-note" class="form-textarea" rows="2" placeholder="Optionale Anmerkung…"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="modal-delete-btn">🗑️ Löschen</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" id="modal-cancel-btn">Abbrechen</button>
+          <button class="btn btn-primary" id="modal-save-btn">
+            <span class="btn-label">Speichern</span>
+            <span class="btn-loader" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
+
+</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>

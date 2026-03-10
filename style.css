@@ -1085,3 +1085,155 @@ body::after {
 
 /* ── Selection ──────────────────────────────────────────────── */
 ::selection { background: rgba(139,109,254,0.3); color: var(--text-bright); }
+
+/* ── Kategorie Verwaltung ───────────────────────────────────── */
+.cat-manage-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.cat-manage-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(10,11,22,.4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  transition: border-color .18s;
+}
+.cat-manage-row:hover { border-color: var(--border-mid); }
+
+.cat-manage-emoji {
+  font-size: 1.2rem;
+  width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.cat-manage-name {
+  flex: 1;
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.cat-manage-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.cat-icon-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all .18s;
+  font-size: .8rem;
+}
+.cat-icon-btn:hover { background: rgba(139,109,254,.08); border-color: var(--border-mid); color: var(--purple-300); }
+.cat-icon-btn.delete:hover { background: var(--rose-dim); border-color: var(--rose-ring); color: var(--rose); }
+
+/* Inline edit row */
+.cat-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cat-emoji-input {
+  width: 64px !important;
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 10px 8px !important;
+  flex-shrink: 0;
+}
+
+/* Inline edit within existing row */
+.cat-manage-row.is-editing .cat-manage-emoji,
+.cat-manage-row.is-editing .cat-manage-name { display: none; }
+.cat-manage-row.is-editing { flex-wrap: wrap; gap: 8px; }
+.cat-inline-edit { display: none; flex: 1; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cat-manage-row.is-editing .cat-inline-edit { display: flex; }
+
+/* ── Edit Modal ─────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(5,6,14,.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 20px;
+  animation: fadeIn .18s ease;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.modal-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--r-xl);
+  padding: 28px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.6), var(--shadow-glow);
+  animation: slideUp .22s cubic-bezier(0.34,1.2,0.64,1);
+  position: relative;
+}
+@keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+.modal-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-bright);
+  letter-spacing: -.02em;
+}
+.modal-close {
+  width: 30px; height: 30px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: .85rem;
+  transition: all .18s;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: var(--rose-dim); border-color: var(--rose-ring); color: var(--rose); }
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+/* Edit button in table */
+.tx-edit-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: .78rem;
+  transition: all .18s;
+  opacity: 0;
+}
+tr:hover .tx-edit-btn,
+.tx-mobile-card:hover .tx-edit-btn { opacity: 1; }
+.tx-edit-btn:hover { background: rgba(139,109,254,.1); border-color: var(--border-mid); color: var(--purple-300); }

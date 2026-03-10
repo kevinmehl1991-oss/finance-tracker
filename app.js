@@ -515,6 +515,7 @@ function init() {
   initMonthSelector();
   setDefaultDate();
   initCatManagement();
+  initEditModal();
   loadCategories();
   initTypeToggle();
 
@@ -704,4 +705,102 @@ function initCatManagement() {
 
   nameInput.addEventListener("keydown", e => { if (e.key === "Enter") saveBtn.click(); });
   renderCatManageList();
+}
+
+// ─── Transaction Edit / Delete ───────────────────────────────
+function openEditModal(tx) {
+  const modal = document.getElementById("edit-modal");
+  modal.style.display = "flex";
+
+  // Fill fields
+  document.getElementById("edit-id").value       = tx.id;
+  document.getElementById("edit-amount").value   = tx.amount;
+  document.getElementById("edit-desc").value     = tx.description || "";
+  document.getElementById("edit-note").value     = tx.note || "";
+  document.getElementById("edit-type").value     = tx.type || "expense";
+
+  // Type toggle
+  document.querySelectorAll("#edit-type-toggle .type-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.type === tx.type);
+  });
+
+  // Category select
+  const sel = document.getElementById("edit-category");
+  sel.innerHTML = "";
+  CONFIG.CATEGORIES.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c.id;
+    opt.textContent = c.emoji + " " + c.label;
+    if (c.id === tx.category) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function closeEditModal() {
+  document.getElementById("edit-modal").style.display = "none";
+}
+
+async function saveEditedTransaction() {
+  const btn = document.getElementById("modal-save-btn");
+  btn.disabled = true;
+  btn.classList.add("is-loading");
+
+  const payload = {
+    id:          document.getElementById("edit-id").value,
+    description: document.getElementById("edit-desc").value.trim(),
+    amount:      parseFloat(document.getElementById("edit-amount").value),
+    type:        document.getElementById("edit-type").value,
+    category:    document.getElementById("edit-category").value,
+    note:        document.getElementById("edit-note").value.trim()
+  };
+
+  try {
+    await apiRequest(CONFIG.API_UPDATE_TRANSACTION, {
+      method: "PUT",
+      body: JSON.stringify(payload)
+    });
+    closeEditModal();
+    await loadTransactions();
+    showBanner("✅ Transaktion aktualisiert.", "success");
+  } catch (err) {
+    showBanner("❌ Fehler: " + err.message, "error");
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove("is-loading");
+  }
+}
+
+async function deleteTransaction(id) {
+  if (!confirm("Transaktion wirklich löschen?")) return;
+  try {
+    await apiRequest(CONFIG.API_DELETE_TRANSACTION + "?id=" + encodeURIComponent(id), {
+      method: "DELETE"
+    });
+    closeEditModal();
+    await loadTransactions();
+    showBanner("✅ Transaktion gelöscht.", "success");
+  } catch (err) {
+    showBanner("❌ Fehler: " + err.message, "error");
+  }
+}
+
+function initEditModal() {
+  document.getElementById("modal-close-btn").addEventListener("click", closeEditModal);
+  document.getElementById("modal-cancel-btn").addEventListener("click", closeEditModal);
+  document.getElementById("edit-modal").addEventListener("click", e => {
+    if (e.target === document.getElementById("edit-modal")) closeEditModal();
+  });
+  document.getElementById("modal-save-btn").addEventListener("click", saveEditedTransaction);
+  document.getElementById("modal-delete-btn").addEventListener("click", () => {
+    deleteTransaction(document.getElementById("edit-id").value);
+  });
+
+  // Type toggle in modal
+  document.getElementById("edit-type-toggle").addEventListener("click", e => {
+    const btn = e.target.closest(".type-btn");
+    if (!btn) return;
+    document.querySelectorAll("#edit-type-toggle .type-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("edit-type").value = btn.dataset.type;
+  });
 }
