@@ -254,7 +254,9 @@ function renderDesktopTable(sorted) {
       <td><span class="badge ${isIncome ? "badge-income" : "badge-expense"}">${isIncome ? "Einnahme" : "Ausgabe"}</span></td>
       <td class="tx-amount-cell ${isIncome ? "income-amt" : "expense-amt"}">
         ${isIncome ? "+" : "−"}${fmt(Math.abs(Number(t.amount)))}
+        <button class="tx-edit-btn" title="Bearbeiten">✏️</button>
       </td>`;
+    tr.querySelector('.tx-edit-btn').addEventListener('click', () => openEditModal(t));
     tbody.appendChild(tr);
   });
 }
@@ -276,7 +278,9 @@ function renderMobileCards(sorted) {
       </div>
       <div class="tx-mobile-amt ${isIncome ? "income-amt" : "expense-amt"}">
         ${isIncome ? "+" : "−"}${fmt(Math.abs(Number(t.amount)))}
-      </div>`;
+      </div>
+      <button class="tx-edit-btn" title="Bearbeiten">✏️</button>`;
+    card.querySelector('.tx-edit-btn').addEventListener('click', () => openEditModal(t));
     container.appendChild(card);
   });
 }

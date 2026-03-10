@@ -1232,8 +1232,8 @@ body::after {
   cursor: pointer;
   font-size: .78rem;
   transition: all .18s;
-  opacity: 0;
+  opacity: 1;
+  margin-left: 6px;
+  flex-shrink: 0;
 }
-tr:hover .tx-edit-btn,
-.tx-mobile-card:hover .tx-edit-btn { opacity: 1; }
 .tx-edit-btn:hover { background: rgba(139,109,254,.1); border-color: var(--border-mid); color: var(--purple-300); }
