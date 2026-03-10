@@ -446,9 +446,28 @@ function updateOnlineStatus() {
 // ─── Month Selector ──────────────────────────────────────────
 function initMonthSelector() {
   const sel = document.getElementById("month-select");
+
+  // Build options from 2025 to current month
+  const now = new Date();
+  const startYear = 2025;
+  const months = ["Januar","Februar","März","April","Mai","Juni",
+                  "Juli","August","September","Oktober","November","Dezember"];
+  sel.innerHTML = "";
+  for (let y = startYear; y <= now.getFullYear(); y++) {
+    const maxM = (y === now.getFullYear()) ? now.getMonth() + 1 : 12;
+    for (let m = 1; m <= maxM; m++) {
+      const val = y + "-" + String(m).padStart(2, "0");
+      const opt = document.createElement("option");
+      opt.value = val;
+      opt.textContent = months[m-1] + " " + y;
+      sel.appendChild(opt);
+    }
+  }
+
   let saved; try { saved = localStorage.getItem(CONFIG.CACHE_KEY_MONTH); } catch (_) {}
   state.selectedMonth = saved || currentMonthStr();
   sel.value = state.selectedMonth;
+
   sel.addEventListener("change", () => {
     state.selectedMonth = sel.value;
     try { localStorage.setItem(CONFIG.CACHE_KEY_MONTH, sel.value); } catch (_) {}

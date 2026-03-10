@@ -362,6 +362,10 @@ body::after {
 }
 
 .month-select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  min-width: 160px;
   background: var(--bg-glass);
   border: 1px solid var(--border-mid);
   border-radius: var(--r-sm);
