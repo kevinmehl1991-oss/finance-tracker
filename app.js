@@ -365,6 +365,7 @@ async function handleFormSubmit(e) {
 
   const payload = {
     id:          generateId(),
+    tx_id:       generateId(),
     date:        document.getElementById("f-date").value,
     description: document.getElementById("f-desc").value.trim(),
     amount:      parseFloat(document.getElementById("f-amount").value),
@@ -717,7 +718,7 @@ function openEditModal(tx) {
   modal.style.display = "flex";
 
   // Fill fields
-  document.getElementById("edit-id").value       = tx.id;
+  document.getElementById("edit-id").value       = tx.tx_id || tx.id;
   document.getElementById("edit-amount").value   = tx.amount;
   document.getElementById("edit-desc").value     = tx.description || "";
   document.getElementById("edit-note").value     = tx.note || "";
@@ -750,7 +751,7 @@ async function saveEditedTransaction() {
   btn.classList.add("is-loading");
 
   const payload = {
-    id:          document.getElementById("edit-id").value,
+    tx_id:       document.getElementById("edit-id").value,
     description: document.getElementById("edit-desc").value.trim(),
     amount:      parseFloat(document.getElementById("edit-amount").value),
     type:        document.getElementById("edit-type").value,
@@ -777,7 +778,7 @@ async function saveEditedTransaction() {
 async function deleteTransaction(id) {
   if (!confirm("Transaktion wirklich löschen?")) return;
   try {
-    await apiRequest(CONFIG.API_DELETE_TRANSACTION + "?id=" + encodeURIComponent(id), {
+    await apiRequest(CONFIG.API_DELETE_TRANSACTION + "?tx_id=" + encodeURIComponent(id), {
       method: "DELETE"
     });
     closeEditModal();
