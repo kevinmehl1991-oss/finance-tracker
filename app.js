@@ -409,8 +409,6 @@ function resetTypeToggle() {
 function applyTheme(theme) {
   state.theme = theme;
   document.documentElement.setAttribute("data-theme", theme);
-  document.getElementById("icon-sun").style.display  = theme === "dark"  ? "block" : "none";
-  document.getElementById("icon-moon").style.display = theme === "light" ? "block" : "none";
   try { localStorage.setItem(CONFIG.CACHE_KEY_THEME, theme); } catch (_) {}
   if (state.chart) renderChart(filteredTransactions());
 }
