@@ -254,9 +254,30 @@
       <!-- ── KATEGORIEN ── -->
       <section id="section-categories" class="section">
         <div class="page-header">
-          <h2 class="page-title">Kategorienübersicht</h2>
+          <h2 class="page-title">Kategorien</h2>
         </div>
+
+        <!-- Verwaltung -->
         <div class="card">
+          <div class="card-header">
+            <span class="card-title">Kategorien verwalten</span>
+            <button class="btn btn-primary btn-sm" id="cat-add-btn">+ Neue Kategorie</button>
+          </div>
+          <div id="cat-new-form" style="display:none;margin-bottom:16px;">
+            <div class="cat-edit-row">
+              <input type="text" id="cat-new-emoji" class="form-input cat-emoji-input" placeholder="😀" maxlength="2"/>
+              <input type="text" id="cat-new-name" class="form-input" placeholder="Kategoriename…"/>
+              <button class="btn btn-primary btn-sm" id="cat-new-save-btn">Speichern</button>
+              <button class="btn btn-ghost btn-sm" id="cat-new-cancel-btn">Abbrechen</button>
+            </div>
+            <span class="field-hint err visible" id="cat-new-err" style="margin-top:6px;display:block;min-height:16px"></span>
+          </div>
+          <div id="cat-manage-list" class="cat-manage-list"></div>
+        </div>
+
+        <!-- Ausgaben Übersicht -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Ausgaben diesen Monat</span></div>
           <div id="category-list" class="cat-list"></div>
           <div class="empty-state-block" id="category-empty" style="display:none">
             <div class="empty-state-emoji">🏷️</div>
