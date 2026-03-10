@@ -445,34 +445,49 @@ function updateOnlineStatus() {
 
 // ─── Month Selector ──────────────────────────────────────────
 function initMonthSelector() {
-  const sel = document.getElementById("month-select");
-
-  // Build options from 2025 to current month
-  const now = new Date();
+  const yearSel  = document.getElementById("year-select");
+  const monthSel = document.getElementById("month-select");
+  const now      = new Date();
   const startYear = 2025;
-  const months = ["Januar","Februar","März","April","Mai","Juni",
-                  "Juli","August","September","Oktober","November","Dezember"];
-  sel.innerHTML = "";
+  const monthNames = ["Januar","Februar","März","April","Mai","Juni",
+                      "Juli","August","September","Oktober","November","Dezember"];
+
+  // Populate year dropdown
+  yearSel.innerHTML = "";
   for (let y = startYear; y <= now.getFullYear(); y++) {
-    const maxM = (y === now.getFullYear()) ? now.getMonth() + 1 : 12;
-    for (let m = 1; m <= maxM; m++) {
-      const val = y + "-" + String(m).padStart(2, "0");
-      const opt = document.createElement("option");
-      opt.value = val;
-      opt.textContent = months[m-1] + " " + y;
-      sel.appendChild(opt);
-    }
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y;
+    yearSel.appendChild(opt);
   }
 
-  let saved; try { saved = localStorage.getItem(CONFIG.CACHE_KEY_MONTH); } catch (_) {}
-  state.selectedMonth = saved || currentMonthStr();
-  sel.value = state.selectedMonth;
-
-  sel.addEventListener("change", () => {
-    state.selectedMonth = sel.value;
-    try { localStorage.setItem(CONFIG.CACHE_KEY_MONTH, sel.value); } catch (_) {}
-    renderAll();
+  // Populate month dropdown (all 12 months)
+  monthSel.innerHTML = "";
+  monthNames.forEach((name, i) => {
+    const opt = document.createElement("option");
+    opt.value = String(i + 1).padStart(2, "0");
+    opt.textContent = name;
+    monthSel.appendChild(opt);
   });
+
+  // Restore saved or use current
+  let saved; try { saved = localStorage.getItem(CONFIG.CACHE_KEY_MONTH); } catch (_) {}
+  const current = saved || currentMonthStr();
+  const [savedY, savedM] = current.split("-");
+  yearSel.value  = savedY;
+  monthSel.value = savedM;
+  state.selectedMonth = current;
+
+  function onSelectionChange() {
+    const y = yearSel.value;
+    const m = monthSel.value;
+    state.selectedMonth = y + "-" + m;
+    try { localStorage.setItem(CONFIG.CACHE_KEY_MONTH, state.selectedMonth); } catch (_) {}
+    renderAll();
+  }
+
+  yearSel.addEventListener("change", onSelectionChange);
+  monthSel.addEventListener("change", onSelectionChange);
 }
 
 // ─── Category Select ─────────────────────────────────────────
