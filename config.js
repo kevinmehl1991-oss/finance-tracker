@@ -9,8 +9,11 @@ const CONFIG = {
   // API Endpunkte (n8n Webhooks)
   // ----------------------------------------------------------
   API_GET_TRANSACTIONS: "https://n8n.srv1474416.hstgr.cloud/webhook/finance/get-transactions",
-API_ADD_TRANSACTION:  "https://n8n.srv1474416.hstgr.cloud/webhook/finance/add-transaction",
-  API_GET_CATEGORIES:   "https://your-n8n-instance.com/webhook/finance/get-categories",
+  API_ADD_TRANSACTION:  "https://n8n.srv1474416.hstgr.cloud/webhook/finance/add-transaction",
+  API_GET_CATEGORIES:   "https://n8n.srv1474416.hstgr.cloud/webhook/finance/get-categories",
+  API_ADD_CATEGORY:     "https://n8n.srv1474416.hstgr.cloud/webhook/finance/add-category",
+  API_UPDATE_CATEGORY:  "https://n8n.srv1474416.hstgr.cloud/webhook/finance/update-category",
+  API_DELETE_CATEGORY:  "https://n8n.srv1474416.hstgr.cloud/webhook/finance/delete-category",
 
   // ----------------------------------------------------------
   // Optionale Request-Headers (z.B. für n8n Basic Auth oder Token)

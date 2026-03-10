@@ -513,8 +513,9 @@ function init() {
   applyTheme(saved || CONFIG.DEFAULT_THEME);
 
   initMonthSelector();
-  populateCategorySelect();
   setDefaultDate();
+  initCatManagement();
+  loadCategories();
   initTypeToggle();
 
   updateOnlineStatus();
@@ -549,3 +550,158 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
+
+// ─── Kategorie API ───────────────────────────────────────────
+async function loadCategories() {
+  try {
+    const data = await apiRequest(CONFIG.API_GET_CATEGORIES);
+    const list = Array.isArray(data) ? data : (data.categories || []);
+    if (list.length > 0) {
+      CONFIG.CATEGORIES = list.map(c => ({
+        id: c.cat_id || c.id,
+        label: c.label,
+        emoji: c.emoji || "📋"
+      }));
+    }
+  } catch (err) {
+    console.warn("Kategorien konnten nicht geladen werden:", err.message);
+  }
+  populateCategorySelect();
+  renderCatManageList();
+}
+
+async function apiAddCategory(cat) {
+  return apiRequest(CONFIG.API_ADD_CATEGORY, {
+    method: "POST",
+    body: JSON.stringify({ cat_id: cat.id, label: cat.label, emoji: cat.emoji })
+  });
+}
+
+async function apiUpdateCategory(cat) {
+  return apiRequest(CONFIG.API_UPDATE_CATEGORY, {
+    method: "PUT",
+    body: JSON.stringify({ cat_id: cat.id, label: cat.label, emoji: cat.emoji })
+  });
+}
+
+async function apiDeleteCategory(catId) {
+  return apiRequest(CONFIG.API_DELETE_CATEGORY + "?cat_id=" + encodeURIComponent(catId), {
+    method: "DELETE"
+  });
+}
+
+// ─── Kategorie Verwaltung UI ─────────────────────────────────
+function renderCatManageList() {
+  const list = document.getElementById("cat-manage-list");
+  if (!list) return;
+  list.innerHTML = "";
+
+  CONFIG.CATEGORIES.forEach((cat, idx) => {
+    const row = document.createElement("div");
+    row.className = "cat-manage-row";
+    row.dataset.idx = idx;
+    row.innerHTML = `
+      <div class="cat-manage-emoji">${cat.emoji}</div>
+      <div class="cat-manage-name">${escHtml(cat.label)}</div>
+      <div class="cat-inline-edit">
+        <input type="text" class="form-input cat-emoji-input" value="${cat.emoji}" maxlength="2" data-field="emoji"/>
+        <input type="text" class="form-input" value="${escHtml(cat.label)}" placeholder="Name…" data-field="label" style="flex:1;min-width:120px"/>
+        <button class="btn btn-primary btn-sm cat-save-btn">✓</button>
+        <button class="btn btn-ghost btn-sm cat-cancel-btn">✕</button>
+      </div>
+      <div class="cat-manage-actions">
+        <button class="cat-icon-btn edit-btn" title="Bearbeiten">✏️</button>
+        <button class="cat-icon-btn delete" title="Löschen">🗑️</button>
+      </div>`;
+
+    row.querySelector(".edit-btn").addEventListener("click", () => {
+      row.classList.toggle("is-editing");
+    });
+
+    row.querySelector(".cat-cancel-btn").addEventListener("click", () => {
+      row.classList.remove("is-editing");
+    });
+
+    row.querySelector(".cat-save-btn").addEventListener("click", async () => {
+      const newEmoji = row.querySelector("[data-field='emoji']").value.trim() || cat.emoji;
+      const newLabel = row.querySelector("[data-field='label']").value.trim();
+      if (!newLabel) return;
+      const updated = { ...cat, emoji: newEmoji, label: newLabel };
+      try {
+        await apiUpdateCategory(updated);
+        CONFIG.CATEGORIES[idx] = updated;
+        populateCategorySelect();
+        renderCatManageList();
+        renderAll();
+        showBanner("✅ Kategorie aktualisiert.", "success");
+      } catch (err) {
+        showBanner("❌ Fehler beim Speichern: " + err.message, "error");
+      }
+    });
+
+    row.querySelector(".delete").addEventListener("click", async () => {
+      if (!confirm(`Kategorie "${cat.label}" wirklich löschen?`)) return;
+      try {
+        await apiDeleteCategory(cat.id);
+        CONFIG.CATEGORIES.splice(idx, 1);
+        populateCategorySelect();
+        renderCatManageList();
+        renderAll();
+        showBanner("✅ Kategorie gelöscht.", "success");
+      } catch (err) {
+        showBanner("❌ Fehler beim Löschen: " + err.message, "error");
+      }
+    });
+
+    list.appendChild(row);
+  });
+}
+
+function initCatManagement() {
+  const addBtn     = document.getElementById("cat-add-btn");
+  const newForm    = document.getElementById("cat-new-form");
+  const saveBtn    = document.getElementById("cat-new-save-btn");
+  const cancelBtn  = document.getElementById("cat-new-cancel-btn");
+  const emojiInput = document.getElementById("cat-new-emoji");
+  const nameInput  = document.getElementById("cat-new-name");
+  const errEl      = document.getElementById("cat-new-err");
+
+  addBtn.addEventListener("click", () => {
+    newForm.style.display = "block";
+    emojiInput.value = "";
+    nameInput.value = "";
+    errEl.textContent = "";
+    nameInput.focus();
+  });
+
+  cancelBtn.addEventListener("click", () => {
+    newForm.style.display = "none";
+    errEl.textContent = "";
+  });
+
+  saveBtn.addEventListener("click", async () => {
+    const emoji = emojiInput.value.trim() || "📋";
+    const label = nameInput.value.trim();
+    if (!label) { errEl.textContent = "Bitte einen Namen eingeben."; return; }
+    const id = label.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "") + "_" + Date.now();
+    const newCat = { id, label, emoji };
+    try {
+      await apiAddCategory(newCat);
+      CONFIG.CATEGORIES.push(newCat);
+      populateCategorySelect();
+      renderCatManageList();
+      renderAll();
+      newForm.style.display = "none";
+      emojiInput.value = "";
+      nameInput.value = "";
+      errEl.textContent = "";
+      showBanner("✅ Kategorie hinzugefügt.", "success");
+    } catch (err) {
+      errEl.textContent = "Fehler: " + err.message;
+    }
+  });
+
+  nameInput.addEventListener("keydown", e => { if (e.key === "Enter") saveBtn.click(); });
+  renderCatManageList();
+}
