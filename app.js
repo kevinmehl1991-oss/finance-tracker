@@ -54,7 +54,9 @@ function loadFromCache() {
 async function apiRequest(url, options = {}) {
   const res = await fetch(url, { headers: CONFIG.API_HEADERS, ...options });
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-  return res.json();
+  const text = await res.text();
+  if (!text || text.trim() === "") return [];
+  return JSON.parse(text);
 }
 async function loadTransactions() {
   setLoading(true);
