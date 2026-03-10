@@ -110,6 +110,7 @@ function renderAll() {
   renderDashboard();
   renderTransactionList();
   renderCategories();
+  renderYearly();
 }
 
 // ─── Dashboard ───────────────────────────────────────────────
@@ -565,9 +566,7 @@ function init() {
   document.querySelectorAll(".nav-item, .mobile-nav-btn").forEach(btn => {
     btn.addEventListener("click", () => showSection(btn.dataset.section));
   });
-  document.getElementById("theme-toggle").addEventListener("click", () => {
-    applyTheme(state.theme === "dark" ? "light" : "dark");
-  });
+
   document.getElementById("reload-btn").addEventListener("click", loadTransactions);
   document.getElementById("tx-form").addEventListener("submit", handleFormSubmit);
 
@@ -841,5 +840,93 @@ function initEditModal() {
     document.querySelectorAll("#edit-type-toggle .type-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("edit-type").value = btn.dataset.type;
+  });
+}
+
+// ─── Jahresübersicht ─────────────────────────────────────────
+let yearlyChart = null;
+
+function renderYearly() {
+  const year = document.getElementById("year-select")?.value || new Date().getFullYear();
+  const yearStr = String(year);
+  const list = state.transactions.filter(t => (t.date || "").startsWith(yearStr));
+
+  const income  = list.filter(t => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
+  const expense = list.filter(t => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
+  const balance = income - expense;
+
+  document.getElementById("yearly-income").textContent  = fmt(income);
+  document.getElementById("yearly-expense").textContent = fmt(expense);
+
+  const balEl = document.getElementById("yearly-balance");
+  balEl.textContent = fmt(balance);
+  balEl.classList.toggle("positive", balance >= 0);
+  balEl.classList.toggle("negative", balance < 0);
+
+  const label = document.getElementById("yearly-label");
+  if (label) label.textContent = "Gesamtjahr " + yearStr;
+
+  // Chart
+  const canvas  = document.getElementById("yearly-chart-canvas");
+  const emptyEl = document.getElementById("yearly-chart-empty");
+  if (!canvas) return;
+
+  const expMap = {};
+  list.filter(t => t.type === "expense").forEach(t => {
+    const k = t.category || "other";
+    expMap[k] = (expMap[k] || 0) + Number(t.amount);
+  });
+
+  if (yearlyChart) { yearlyChart.destroy(); yearlyChart = null; }
+
+  if (!Object.keys(expMap).length) {
+    canvas.style.display = "none";
+    emptyEl.classList.add("visible");
+    return;
+  }
+  canvas.style.display = "block";
+  emptyEl.classList.remove("visible");
+
+  const palette = [
+    "#8b6dfe","#ae96ff","#c4b5fd","#a5b4fc","#86efac",
+    "#fca5a5","#fcd34d","#93c5fd","#e879f9","#6ee7b7"
+  ];
+  const labels = Object.keys(expMap);
+  const data   = Object.values(expMap);
+
+  yearlyChart = new Chart(canvas, {
+    type: "doughnut",
+    data: {
+      labels: labels.map(l => { const m = getCategoryMeta(l); return `${m.emoji} ${m.label}`; }),
+      datasets: [{
+        data,
+        backgroundColor: palette.slice(0, labels.length),
+        borderWidth: 3,
+        borderColor: "#0e0f1c",
+        hoverBorderWidth: 3,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            color: "#7872a8",
+            font: { size: 12, family: "'Plus Jakarta Sans', sans-serif", weight: "500" },
+            padding: 18, boxWidth: 11, borderRadius: 3, useBorderRadius: true
+          }
+        },
+        tooltip: {
+          callbacks: { label: ctx => `  ${fmt(ctx.parsed)}` },
+          backgroundColor: "#13142a", titleColor: "#f0eeff", bodyColor: "#c4bef0",
+          borderColor: "rgba(139,109,254,0.2)", borderWidth: 1, padding: 14, cornerRadius: 12
+        }
+      },
+      animation: { animateRotate: true, duration: 700 },
+      cutout: "68%"
+    }
   });
 }
