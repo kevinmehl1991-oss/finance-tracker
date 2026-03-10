@@ -76,7 +76,8 @@ async function loadTransactions() {
       showBanner("⚠️ Offline – Daten aus dem Cache.", "warning");
     } else {
       state.transactions = [];
-      showBanner("❌ Keine Verbindung und kein Cache.", "error");
+      // Leere Table ist kein Fehler
+      showBanner(null);
     }
   } finally {
     setLoading(false);
